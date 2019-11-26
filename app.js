@@ -20,6 +20,15 @@ app.get('/', (req, res) => {
   res.render('index', { title: 'ZOOM+Care Candidate Code Challenge - NodeJS API' });
 });
 
+// ignore favicon requests
+app.use( function(req, res, next) {
+  if (req.originalUrl && req.originalUrl.split("/").pop() === 'favicon.ico') {
+    return res.sendStatus(204);
+  }
+
+  return next();
+});
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

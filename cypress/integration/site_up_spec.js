@@ -4,5 +4,11 @@ describe('GIVEN the ZoomCare website', () => {
       cy.visit('/')
       cy.contains('ZOOM+Care')
     })
+    it('AND the missing favicon is ignored', () => {
+      cy.request('/favicon.ico')
+        .then((response) => {
+          expect(response.status).to.equal(204)
+        });
+    })
   })
 })
