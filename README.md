@@ -29,6 +29,9 @@ Ensure you have the latest LTS NodeJS and NPM versions installed. Preferred vers
 # Install dependencies
 npm install
 
+# Install dependencies as identified by package lock, as would a CI server
+npm ci --no-optional
+
 # Run in development mode with `nodemon`
 npm run dev
 
@@ -36,6 +39,25 @@ npm run dev
 npm run start
 ```
 Navigate to `localhost:3001` on your machine and the index page should be accessible. All API endpoints should also be accessible from this URL and port.
+
+## Containerized Development
+To ensure standardized development practices, we recommend building, developing, and running using the same approach that a CI server would perform:  Ephemeral containers.  We develop for this product using the [node:10 Docker image](https://hub.docker.com/_/node) Use the following commands to achieve this using Docker:
+
+```bash
+# Install dependencies
+docker run -it --rm -v $(pwd):$(pwd) -w $(pwd)  node:10 npm install
+
+# Install dependencies as identified by package lock, as would a CI server
+docker run -it --rm -v $(pwd):$(pwd) -w $(pwd)  node:10 npm ci --no-optional
+
+# Run in development mode with `nodemon`
+docker run -it --rm -v $(pwd):$(pwd) -w $(pwd) -p 3001:3001 node:10 npm run dev
+
+# Optionally, run directly with `node`
+docker run -it --rm -v $(pwd):$(pwd) -w $(pwd) -p 3001:3001 node:10 npm run start
+```
+
+This will also allow your application instance to be available via port `3001`.  Alternatively, for ephemeral port mapping and discovery, simply leave off the left-half of the port option, e.g.: `-p :3001`.
 
 ## Data Schema Reference
 Here are some simple examples of the three data types used in this project. You can see the full data in the `data` folder.  
