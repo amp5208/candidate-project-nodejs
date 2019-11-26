@@ -47,10 +47,10 @@ To ensure standardized development practices, we recommend building, developing,
 
 ```bash
 # Install dependencies
-docker run -it --rm -v $(pwd):$(pwd) -w $(pwd)  node:10 npm install
+docker run -it --rm -v $(pwd):$(pwd) -w $(pwd) node:10 npm install
 
 # Install dependencies as identified by package lock, as would a CI server
-docker run -it --rm -v $(pwd):$(pwd) -w $(pwd)  node:10 npm ci --no-optional
+docker run -it --rm -v $(pwd):$(pwd) -w $(pwd) node:10 npm ci --no-optional
 
 # Run in development mode with `nodemon`
 docker run -it --rm -v $(pwd):$(pwd) -w $(pwd) -p 3001:3001 node:10 npm run dev
@@ -60,6 +60,32 @@ docker run -it --rm -v $(pwd):$(pwd) -w $(pwd) -p 3001:3001 node:10 npm run star
 ```
 
 This will also allow your application instance to be available via port `3001`.  Alternatively, for ephemeral port mapping and discovery, simply leave off the left-half of the port option, e.g.: `-p :3001`.
+
+## End-to-End Testing
+This application is setup to test integrated functionality using [Cypress](https://www.cypress.io/).  To run tests using the exact configuration used by CI, use the following Docker command:
+
+```bash
+# Install testing dependencies
+docker run -it --rm -v $(pwd):$(pwd) -w $(pwd) node:10 npm ci --no-optional
+
+# Run app in test mode
+docker run -it --rm -v $(pwd):$(pwd) -w $(pwd) --name zoomapp -p 3001:3001 node:10 npm run start
+
+# Run test suite
+docker run -it --rm -v $(pwd):$(pwd) -w $(pwd) --name cypresszoom --link zoomapp cypress/included:3.6.1
+```
+
+You can easily modify the base URL to be tested by adjusting the `./cypress.json` configuration file.  The default is the static linked Docker container name subbed as the hostname.
+
+_TODO_:  `--link` is deprecated in Docker, in favor of network creation.  However, this resolves issues that might exist if an engineer is using a VPN.  CI servers will likely auto-resolve this using their in-built container service discovery and node workers.
+
+To run within the context of the CI server, we recommend running within the maintained/approved Cypress inclusive Docker image:
+
+```bash
+docker run -it --rm -v $(pwd):$(pwd) -w $(pwd) --entrypoint="npm" cypress/included:3.6.1 run test:e2e
+```
+
+_Please note_: Running in this way is faster and simpler than the earlier, but it can yield unexpected behavior, given that Cypress now only supports Docker images including NodeJS v12+.  The application is set to otherwise be built/deployed using NodeJS v10.X.
 
 ## Data Schema Reference
 Here are some simple examples of the three data types used in this project. You can see the full data in the `data` folder.  
