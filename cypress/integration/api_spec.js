@@ -3,7 +3,7 @@ describe('GIVEN the ZoomCare API', () => {
     it('THEN a success response is retrieved', () => {
       cy.request('GET', '/')
         .then((response) => {
-          expect(response.status).to.equal(200)
+          expect(response.status).to.equal(200);
         });
     })
   })
